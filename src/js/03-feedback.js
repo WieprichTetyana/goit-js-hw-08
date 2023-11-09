@@ -2,7 +2,7 @@ import throttle  from 'lodash.throttle';
 
 const contactFormEl = document.querySelector('.js-feedback-form');
 
-const userData = {};
+let userData = {};
 
 const fillFeedbackFormField = () => {
   const userDataFromLS = localStorage.getItem('contactFormInfo');
@@ -16,6 +16,7 @@ if (userDataFromLS) {
       contactFormEl.elements[key].value = userDataParsed[key];
     }
   }
+  userData = userDataParsed
 }
 };
 
@@ -25,7 +26,7 @@ const feedbackFormStateThrottle = throttle(({ target: feedbackFormField }) => {
   const feedbackFormFieldValue = feedbackFormField.value;
   const feedbackFormFieldName = feedbackFormField.name;
 
-  userData[feedbackFormFieldName] = feedbackFormFieldValue;
+  userData = { ...userData, [feedbackFormFieldName]: feedbackFormFieldValue };
 
   localStorage.setItem('contactFormInfo', JSON.stringify(userData));
 }, 500);
@@ -35,7 +36,8 @@ const feedbackFormSubmit = event => {
 
   contactFormEl.reset();
   localStorage.removeItem('contactFormInfo');
+  userData = {};
 };
 
-contactFormEl.addEventListener('change', feedbackFormStateThrottle);
+contactFormEl.addEventListener('input', feedbackFormStateThrottle);
 contactFormEl.addEventListener('submit', feedbackFormSubmit);
